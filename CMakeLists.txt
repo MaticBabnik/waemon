@@ -32,12 +32,14 @@ function(protocol proj protoPath protoName external)
     endif()
 endfunction()
 
-add_executable(paper src/main.cc src/wayland.cc src/panic.cc)
+file(GLOB_RECURSE SRCFILES "src/*.cc")
+add_executable(paper ${SRCFILES})
 
 set_property(TARGET paper PROPERTY CXX_STANDARD 23)
 
 protocol(paper "protocols/wlr-layer-shell-unstable-v1.xml" "wlr-layer-shell-unstable-v1" true)
 protocol(paper "stable/xdg-shell/xdg-shell.xml" "xdg-shell" false)
+protocol(paper "protocols/xdg-output-unstable-v1.xml" "xdg-output-unstable-v1" true)
 
 target_link_libraries(paper wayland-client)
-target_include_directories(paper PRIVATE ${WL_CODEGEN_DIR})
+target_include_directories(paper PRIVATE src/ ${WL_CODEGEN_DIR})
