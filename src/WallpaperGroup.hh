@@ -1,13 +1,14 @@
 #pragma once
 
-#include <memory>
-#include <set>
-#include <string>
-#include <vector>
-
+#include "WallpaperImage.hh"
 #include "util/rect.hh"
 #include "wayland/LayerSurface.hh"
 #include "wayland/WaylandOutput.hh"
+#include <memory>
+#include <optional>
+#include <set>
+#include <string>
+#include <vector>
 
 class WaylandOutput;
 
@@ -23,9 +24,15 @@ class BaseWallpaperGroup {
     virtual bool removeByWlName(uint32_t wl_name)                   = 0;
     virtual const std::string &getName() const                      = 0;
 
+    void setWallpaper(std::shared_ptr<WallpaperImage> image);
+
   protected:
+    virtual void applyWallpaper();
+
     Rect                     bounds{0, 0, 0, 0};
     std::vector<GroupOutput> outputs;
+
+    std::optional<std::shared_ptr<WallpaperImage>> wallpaper;
 };
 
 class BasicSingleMonitorGroup : public BaseWallpaperGroup {

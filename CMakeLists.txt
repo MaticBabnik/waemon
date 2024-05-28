@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 project(paper)
 
@@ -37,9 +38,14 @@ add_executable(paper ${SRCFILES})
 
 set_property(TARGET paper PROPERTY CXX_STANDARD 23)
 
+find_package(OpenImageIO REQUIRED)
+find_package(CAIRO REQUIRED)
+
+
 protocol(paper "protocols/wlr-layer-shell-unstable-v1.xml" "wlr-layer-shell-unstable-v1" true)
 protocol(paper "stable/xdg-shell/xdg-shell.xml" "xdg-shell" false)
 protocol(paper "protocols/xdg-output-unstable-v1.xml" "xdg-output-unstable-v1" true)
 
-target_link_libraries(paper wayland-client)
-target_include_directories(paper PRIVATE src/ ${WL_CODEGEN_DIR})
+
+target_link_libraries(paper PRIVATE wayland-client ${OpenImageIO_LIBRARY} ${CAIRO_LIBRARIES})
+target_include_directories(paper PRIVATE src/ ${WL_CODEGEN_DIR} ${OpenImageIO_INCLUDE_DIR} ${CAIRO_INCLUDE_DIRS})

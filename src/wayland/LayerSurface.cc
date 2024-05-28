@@ -31,7 +31,7 @@ int make_tmpfile(size_t size) {
     if (fd == -1) panic("mkostemp failed");
 
     if (unlink(tmpname.c_str()) != 0)
-        std::print(std::cout, "Couldn't unlink tmpfile\n");
+        std::print(std::cerr, "Couldn't unlink tmpfile\n");
 
     if (ftruncate(fd, size) < 0) panic("ftruncate failed");
 
@@ -39,8 +39,9 @@ int make_tmpfile(size_t size) {
 }
 
 LayerSurface::LayerSurface(std::shared_ptr<WaylandOutput> wo_)
-    : wm(wo_->wm), wo(wo_) {
-    surface    = wl_compositor_create_surface(wm->compositor);
+    : wm(wo_->wm), wo(wo_), paintCb() {
+    surface = wl_compositor_create_surface(wm->compositor);
+
     layer_surf = zwlr_layer_shell_v1_get_layer_surface(
         wm->layer_shell,
         surface,
@@ -63,7 +64,12 @@ LayerSurface::LayerSurface(std::shared_ptr<WaylandOutput> wo_)
     wl_surface_commit(surface);
 }
 
-void LayerSurface::paint() {
+void LayerSurface::paint(PaintCallback callback) {
+    if (!configured) {
+        this->paintCb = callback;
+        return;
+    }
+
     auto b      = wo->getBounds();
     auto stride = b.w * 4, size = stride * b.h;
 
@@ -81,14 +87,27 @@ void LayerSurface::paint() {
         b.w,
         b.h,
         stride,
-        WL_SHM_FORMAT_ABGR8888
+        WL_SHM_FORMAT_ARGB8888
     );
 
     wl_shm_pool_destroy(pool);
     close(fd);
 
-    for (auto i = 0; i < b.w * b.h; i++)
-        buf[i] = 0xffff0000;
+    auto c_surf = cairo_image_surface_create_for_data(
+        (unsigned char *)buf,
+        CAIRO_FORMAT_ARGB32,
+        b.w,
+        b.h,
+        stride
+    );
+
+    auto cairo = cairo_create(c_surf);
+
+    callback(cairo);
+
+    cairo_surface_flush(c_surf);
+    cairo_destroy(cairo);
+    cairo_surface_destroy(c_surf);
 
     munmap(buf, size);
 
@@ -107,5 +126,10 @@ void LayerSurface::ON_LAYER_SURF_CONFIGURE(
     auto that = reinterpret_cast<LayerSurface *>(data);
 
     zwlr_layer_surface_v1_ack_configure(surf, ser);
-    that->paint();
+    that->configured = true;
+
+    if (that->paintCb.has_value()) {
+        that->paint(that->paintCb.value());
+        that->paintCb = {};
+    }
 }

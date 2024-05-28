@@ -28,7 +28,7 @@ class WaylandOutput {
     bool                       posValid, sizeValid;
     uint32_t                   wl_name;
     std::optional<std::string> name;
-    uint32_t                   w, h, x, y;
+    int32_t                   w, h, x, y;
 
     WaylandManager *wm;
     wl_output      *w_output;

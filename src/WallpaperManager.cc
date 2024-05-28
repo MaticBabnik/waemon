@@ -15,7 +15,7 @@ void WallpaperManager::inputReady(uint32_t wlName) {
     for (auto &group : groups | std::views::values) {
         if (group->matchOutput(output)) {
             std::print(
-                std::cout,
+                std::cerr,
                 "Grouped output '{}' into '{}'\n",
                 output->getName(),
                 group->getName()
@@ -25,7 +25,7 @@ void WallpaperManager::inputReady(uint32_t wlName) {
     }
 
     std::print(
-        std::cout,
+        std::cerr,
         "Creating group for output '{}'\n",
         output->getName()
     );

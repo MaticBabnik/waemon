@@ -17,7 +17,6 @@ class WaylandManager {
   public:
     WaylandManager(const char *display = nullptr);
 
-    void init();
     void dispatch();
 
     friend class WaylandOutput;

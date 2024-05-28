@@ -4,11 +4,36 @@
 #include <ranges>
 #include <utility>
 
+void BaseWallpaperGroup::setWallpaper(std::shared_ptr<WallpaperImage> img) {
+    this->wallpaper = img;
+}
+
+void BaseWallpaperGroup::applyWallpaper() {
+    if (!wallpaper.has_value()) return;
+
+    for (auto &o : outputs) {
+        auto wp = this->wallpaper->get();
+        auto r  = o.localBounds;
+
+        o.wallpaperSurface->paint([wp, r](cairo_t *cr) {
+            // paint background color
+            cairo_set_source_rgb(cr, 0.0, 0.0, 0.0);
+            cairo_paint(cr);
+
+            // paint the image
+            cairo_set_source_surface(cr, wp->surface, -r.x, -r.y);
+            cairo_paint(cr);
+        });
+    }
+}
+
 BasicSingleMonitorGroup::BasicSingleMonitorGroup(
     std::shared_ptr<WaylandOutput> output
 ) {
     outputs = std::vector<GroupOutput>();
     bounds  = output->getBounds();
+
+    wallpaper = {};
 
     outputs.push_back({
         .localBounds      = Rect(0, 0, bounds.w, bounds.h),
@@ -16,7 +41,7 @@ BasicSingleMonitorGroup::BasicSingleMonitorGroup(
         .wallpaperSurface = std::make_unique<LayerSurface>(output),
     });
 
-    outputs[0].wallpaperSurface->paint();
+    // outputs[0].wallpaperSurface->paint();
 }
 
 const std::string &BasicSingleMonitorGroup::getName() const {
@@ -37,7 +62,9 @@ bool BasicSingleMonitorGroup::removeByWlName(uint32_t wl_name) {
 }
 
 SpanGroup::SpanGroup(std::string _name, std::set<std::string> _outputNames)
-    : name(std::move(_name)), outputNames(std::move(_outputNames)) {}
+    : name(std::move(_name)), outputNames(std::move(_outputNames)) {
+    wallpaper = {};
+}
 
 const std::string &SpanGroup::getName() const { return name; }
 
@@ -52,6 +79,7 @@ bool SpanGroup::matchOutput(std::shared_ptr<WaylandOutput> output) {
         });
 
         recomputeBounds();
+        applyWallpaper();
         return true;
     }
 
@@ -67,31 +95,12 @@ void SpanGroup::recomputeBounds() {
     }
     this->bounds = boundingBox;
 
-    std::print(
-        std::cout,
-        "RecomputeBounds:  ({},{}) ({}x{})\n",
-        boundingBox.x,
-        boundingBox.y,
-        boundingBox.w,
-        boundingBox.h
-    );
-
     // make localBounds local
     for (auto &o : outputs) {
         auto b = o.output->getBounds();
 
         o.localBounds.x = b.x - boundingBox.x;
         o.localBounds.y = b.y - boundingBox.y;
-
-        std::print(
-            std::cout,
-            "\t{} ({},{}) ({}x{})\n",
-            o.output->getName(),
-            o.localBounds.x,
-            o.localBounds.y,
-            b.w,
-            b.h
-        );
     }
 }
 

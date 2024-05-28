@@ -64,16 +64,7 @@ uint32_t WaylandOutput::getWlName() const { return this->wl_name; }
 
 void WaylandOutput::notify_manager_if_valid() {
     if (!valid()) return;
-
-    std::print(
-        std::cout,
-        "New output {} {}x{}@{},{}\n",
-        name.value(),
-        w,
-        h,
-        x,
-        y
-    );
+    
     this->wm->inputReady(this->wl_name);
 }
 

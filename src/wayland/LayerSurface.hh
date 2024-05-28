@@ -1,13 +1,18 @@
 #pragma once
+#include <cairo/cairo.h>
+#include <functional>
 #include <memory>
+#include <optional>
 
 #include "WaylandManager.hh"
 #include "WaylandOutput.hh"
 
 class LayerSurface {
+    using PaintCallback = std::function<void(cairo_t *)>;
+
   public:
     explicit LayerSurface(std::shared_ptr<WaylandOutput> wo_);
-    void paint();
+    void paint(PaintCallback callback);
 
   private:
     WaylandManager                *wm;
@@ -15,6 +20,10 @@ class LayerSurface {
 
     wl_surface            *surface;
     zwlr_layer_surface_v1 *layer_surf;
+
+    bool configured;
+
+    std::optional<PaintCallback> paintCb;
 
     const static wl_buffer_listener             BUFFER_LISTENER;
     const static zwlr_layer_surface_v1_listener LAYER_SURF_LISTENER;

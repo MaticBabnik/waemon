@@ -71,12 +71,7 @@ void WaylandManager::ON_REG_GLOBAL(
             &zxdg_output_manager_v1_interface,
             1
         );
-
-    } else {
-        return; // we don't care about this interface
     }
-
-    std::print(std::cout, "Got {} v{} ({})\n", iface, ver, name);
 }
 
 void WaylandManager::ON_REG_REMOVE(
@@ -98,9 +93,7 @@ WaylandManager::WaylandManager(const char *display) {
 
     this->registry = wl_display_get_registry(this->display);
     wl_registry_add_listener(this->registry, &REGISTRY_LISTENER, this);
-}
 
-void WaylandManager::init() {
     wl_display_roundtrip(this->display);
 
     if (!this->compositor) panic("Wayland global is missing(compositor)!");
@@ -114,9 +107,9 @@ void WaylandManager::init() {
 void WaylandManager::dispatch() { wl_display_dispatch(this->display); }
 
 void WaylandManager::inputReady(uint32_t wlName) {
-    std::print(std::cout, "Input ready: {}\n", wlName);
+    std::print(std::cerr, "Input ready: {}\n", wlName);
 }
 
 void WaylandManager::inputLost(uint32_t wlName) {
-    std::print(std::cout, "Input lost: {}\n", wlName);
+    std::print(std::cerr, "Input lost: {}\n", wlName);
 }
