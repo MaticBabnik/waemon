@@ -31,7 +31,6 @@ class WaylandManager {
     wl_compositor          *compositor;
     wl_shm                 *shm;
     xdg_wm_base            *wm_base;
-    xdg_toplevel           *toplevel;
     zwlr_layer_shell_v1    *layer_shell;
     zxdg_output_manager_v1 *output_manager;
 

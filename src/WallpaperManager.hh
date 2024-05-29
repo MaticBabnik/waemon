@@ -8,7 +8,7 @@
 
 class WallpaperManager : public WaylandManager {
   public:
-    WallpaperManager(const char *display);
+    explicit WallpaperManager(const char *display);
     void debugAddGroup(std::unique_ptr<BaseWallpaperGroup> wg);
     std::map<std::string, std::unique_ptr<BaseWallpaperGroup>> groups;
 

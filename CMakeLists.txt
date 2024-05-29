@@ -3,7 +3,6 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 project(paper)
 
-
 execute_process(
     COMMAND pkg-config --variable=pkgdatadir wayland-protocols
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}

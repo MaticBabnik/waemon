@@ -22,9 +22,10 @@ class BaseWallpaperGroup {
   public:
     virtual bool matchOutput(std::shared_ptr<WaylandOutput> output) = 0;
     virtual bool removeByWlName(uint32_t wl_name)                   = 0;
-    virtual const std::string &getName() const                      = 0;
 
-    void setWallpaper(std::shared_ptr<WallpaperImage> image);
+    virtual const std::string &getName() const = 0;
+
+    void setWallpaper(const std::shared_ptr<WallpaperImage> &image);
 
   protected:
     virtual void applyWallpaper();
@@ -37,7 +38,9 @@ class BaseWallpaperGroup {
 
 class BasicSingleMonitorGroup : public BaseWallpaperGroup {
   public:
-    explicit BasicSingleMonitorGroup(std::shared_ptr<WaylandOutput> output);
+    explicit BasicSingleMonitorGroup(
+        const std::shared_ptr<WaylandOutput> &output
+    );
 
     const std::string &getName() const override;
     bool matchOutput(std::shared_ptr<WaylandOutput> output) override;

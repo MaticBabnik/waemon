@@ -4,7 +4,8 @@
 #include <ranges>
 #include <utility>
 
-void BaseWallpaperGroup::setWallpaper(std::shared_ptr<WallpaperImage> img) {
+void BaseWallpaperGroup::setWallpaper(const std::shared_ptr<WallpaperImage> &img
+) {
     this->wallpaper = img;
 }
 
@@ -28,7 +29,7 @@ void BaseWallpaperGroup::applyWallpaper() {
 }
 
 BasicSingleMonitorGroup::BasicSingleMonitorGroup(
-    std::shared_ptr<WaylandOutput> output
+    const std::shared_ptr<WaylandOutput> &output
 ) {
     outputs = std::vector<GroupOutput>();
     bounds  = output->getBounds();

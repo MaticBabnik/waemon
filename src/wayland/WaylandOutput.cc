@@ -1,5 +1,4 @@
 #include "WaylandOutput.hh"
-#include <cstring>
 #include <iostream>
 
 const zxdg_output_v1_listener WaylandOutput::XDG_OUTPUT_LISTENER = {
@@ -20,6 +19,7 @@ const wl_output_listener WaylandOutput::WL_OUTPUT_LISTENER = {
 };
 
 WaylandOutput::WaylandOutput(WaylandManager *wm, uint32_t wl_name) {
+    x = y = w = h  = 0;
     this->wm       = wm;
     this->wl_name  = wl_name;
     this->w_output = (wl_output *)
@@ -64,15 +64,15 @@ uint32_t WaylandOutput::getWlName() const { return this->wl_name; }
 
 void WaylandOutput::notify_manager_if_valid() {
     if (!valid()) return;
-    
+
     this->wm->inputReady(this->wl_name);
 }
 
 void WaylandOutput::ON_XDG_OUT_POS(
-    void           *data,
-    zxdg_output_v1 *output,
-    int32_t         x,
-    int32_t         y
+    void *data,
+    zxdg_output_v1 *,
+    int32_t x,
+    int32_t y
 ) {
     auto that = reinterpret_cast<WaylandOutput *>(data);
 
@@ -84,10 +84,10 @@ void WaylandOutput::ON_XDG_OUT_POS(
 }
 
 void WaylandOutput::ON_XDG_OUT_SIZE(
-    void           *data,
-    zxdg_output_v1 *output,
-    int32_t         w,
-    int32_t         h
+    void *data,
+    zxdg_output_v1 *,
+    int32_t w,
+    int32_t h
 ) {
     auto that = reinterpret_cast<WaylandOutput *>(data);
 
@@ -98,11 +98,7 @@ void WaylandOutput::ON_XDG_OUT_SIZE(
     that->notify_manager_if_valid();
 }
 
-void WaylandOutput::ON_WL_OUT_NAME(
-    void       *data,
-    wl_output  *out,
-    const char *name
-) {
+void WaylandOutput::ON_WL_OUT_NAME(void *data, wl_output *, const char *name) {
     auto that = reinterpret_cast<WaylandOutput *>(data);
 
     that->name = std::string(name);
@@ -110,19 +106,19 @@ void WaylandOutput::ON_WL_OUT_NAME(
 }
 
 void WaylandOutput::ON_WL_OUT_GEOMETRY(
-    void       *data,
-    wl_output  *output,
-    int32_t     x,
-    int32_t     y,
-    int32_t     w,
-    int32_t     h,
-    int32_t     subpx,
-    const char *make,
-    const char *model,
-    int32_t     transform
+    void *,
+    wl_output *,
+    int32_t,
+    int32_t,
+    int32_t,
+    int32_t,
+    int32_t,
+    const char *,
+    const char *,
+    int32_t
 ) {}
 
-void WaylandOutput::ON_WL_OUT_DONE_DUMMY(void *, wl_output *wo) {}
+void WaylandOutput::ON_WL_OUT_DONE_DUMMY(void *, wl_output *) {}
 
 void WaylandOutput::ON_WL_OUT_MODE_DUMMY(
     void *,
@@ -135,16 +131,9 @@ void WaylandOutput::ON_WL_OUT_MODE_DUMMY(
 
 void WaylandOutput::ON_WL_OUT_SCALE_DUMMY(void *, wl_output *, int32_t) {}
 
-void WaylandOutput::ON_WL_OUT_DESC_DUMMY(
-    void *,
-    wl_output *,
-    const char *description
-) {}
+void WaylandOutput::ON_WL_OUT_DESC_DUMMY(void *, wl_output *, const char *) {}
 
-void WaylandOutput::ON_XDG_OUT_STRING_DUMMY(
-    void           *data,
-    zxdg_output_v1 *output,
-    const char     *name
-) {}
+void WaylandOutput::
+    ON_XDG_OUT_STRING_DUMMY(void *, zxdg_output_v1 *, const char *) {}
 
-void WaylandOutput::ON_XDG_OUT_DONE_DUMMY(void *data, zxdg_output_v1 *output) {}
+void WaylandOutput::ON_XDG_OUT_DONE_DUMMY(void *, zxdg_output_v1 *) {}

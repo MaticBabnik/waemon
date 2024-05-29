@@ -18,5 +18,5 @@ Rect Rect::boundingBoxWith(const Rect &that) const {
     auto right  = std::max(getRight(), that.getRight());
     auto bottom = std::max(getBottom(), that.getBottom());
 
-    return Rect(left, top, right - left, bottom - top);
+    return {left, top, right - left, bottom - top};
 }

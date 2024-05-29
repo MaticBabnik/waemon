@@ -11,8 +11,8 @@ class LayerSurface {
     using PaintCallback = std::function<void(cairo_t *)>;
 
   public:
-    explicit LayerSurface(std::shared_ptr<WaylandOutput> wo_);
-    void paint(PaintCallback callback);
+    explicit LayerSurface(const std::shared_ptr<WaylandOutput> &wo_);
+    void paint(const PaintCallback &callback);
 
   private:
     WaylandManager                *wm;

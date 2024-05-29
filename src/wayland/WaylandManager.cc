@@ -1,9 +1,7 @@
 #include "WaylandManager.hh"
 #include "util/panic.hh"
-#include <algorithm>
 #include <cstring>
 #include <iostream>
-#include <ranges>
 
 const wl_registry_listener WaylandManager::REGISTRY_LISTENER = {
     .global        = WaylandManager::ON_REG_GLOBAL,
@@ -24,11 +22,11 @@ T *bindGlobal(
  * Disgusting code...
  */
 void WaylandManager::ON_REG_GLOBAL(
-    void        *data,
-    wl_registry *reg,
-    uint32_t     name,
-    const char  *iface,
-    uint32_t     ver
+    void *data,
+    wl_registry *,
+    uint32_t    name,
+    const char *iface,
+    uint32_t
 ) {
     auto that = reinterpret_cast<WaylandManager *>(data);
 
@@ -74,11 +72,7 @@ void WaylandManager::ON_REG_GLOBAL(
     }
 }
 
-void WaylandManager::ON_REG_REMOVE(
-    void        *data,
-    wl_registry *reg,
-    uint32_t     name
-) {
+void WaylandManager::ON_REG_REMOVE(void *data, wl_registry *, uint32_t name) {
     auto that = reinterpret_cast<WaylandManager *>(data);
 
     if (that->outputs.contains(name)) {
@@ -88,6 +82,12 @@ void WaylandManager::ON_REG_REMOVE(
 }
 
 WaylandManager::WaylandManager(const char *display) {
+    shm            = nullptr;
+    compositor     = nullptr;
+    wm_base        = nullptr;
+    layer_shell    = nullptr;
+    output_manager = nullptr;
+
     this->display = wl_display_connect(display);
     if (!this->display) panic("Couldn't connect to display.");
 

@@ -3,11 +3,9 @@
 #include <fcntl.h>
 #include <iostream>
 #include <sys/mman.h>
-#include <sys/types.h>
-#include <syscall.h>
 #include <unistd.h>
 
-static void release_buffer(void *data, struct wl_buffer *wl_buffer) {
+static void release_buffer(void *, struct wl_buffer *wl_buffer) {
     wl_buffer_destroy(wl_buffer);
 }
 
@@ -33,13 +31,13 @@ int make_tmpfile(size_t size) {
     if (unlink(tmpname.c_str()) != 0)
         std::print(std::cerr, "Couldn't unlink tmpfile\n");
 
-    if (ftruncate(fd, size) < 0) panic("ftruncate failed");
+    if (ftruncate(fd, (ssize_t)size) < 0) panic("ftruncate failed");
 
     return fd;
 }
 
-LayerSurface::LayerSurface(std::shared_ptr<WaylandOutput> wo_)
-    : wm(wo_->wm), wo(wo_), paintCb() {
+LayerSurface::LayerSurface(const std::shared_ptr<WaylandOutput> &wo_)
+    : wm(wo_->wm), wo(wo_), paintCb(), configured(false) {
     surface = wl_compositor_create_surface(wm->compositor);
 
     layer_surf = zwlr_layer_shell_v1_get_layer_surface(
@@ -64,7 +62,7 @@ LayerSurface::LayerSurface(std::shared_ptr<WaylandOutput> wo_)
     wl_surface_commit(surface);
 }
 
-void LayerSurface::paint(PaintCallback callback) {
+void LayerSurface::paint(const PaintCallback &callback) {
     if (!configured) {
         this->paintCb = callback;
         return;
@@ -120,8 +118,8 @@ void LayerSurface::ON_LAYER_SURF_CONFIGURE(
     void                  *data,
     zwlr_layer_surface_v1 *surf,
     uint32_t               ser,
-    uint32_t               w,
-    uint32_t               h
+    uint32_t,
+    uint32_t
 ) {
     auto that = reinterpret_cast<LayerSurface *>(data);
 

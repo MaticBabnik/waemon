@@ -11,7 +11,7 @@ class WallpaperImage {
     ~WallpaperImage();
 
   protected:
-    bool fixColorFormat(std::string &colorFormat );
+    bool fixColorFormat(std::string &colorFormat);
 
     uint32_t  width, height;
     uint32_t *pixeldata;
