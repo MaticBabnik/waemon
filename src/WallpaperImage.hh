@@ -1,4 +1,5 @@
 #pragma once
+#include "util/math2d.hh"
 #include <OpenImageIO/imageio.h>
 #include <cairo/cairo.h>
 #include <string>
@@ -9,6 +10,8 @@ class WallpaperImage {
 
     explicit WallpaperImage(const std::string &path);
     ~WallpaperImage();
+
+    Vec2<int> size() const;
 
   protected:
     bool fixColorFormat(std::string &colorFormat);

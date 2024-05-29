@@ -7,7 +7,7 @@
 #include <xdg-output-unstable-v1.h>
 
 #include "WaylandManager.hh"
-#include "util/rect.hh"
+#include "util/math2d.hh"
 
 class WaylandManager;
 class LayerSurface;
@@ -19,7 +19,7 @@ class WaylandOutput {
 
     bool               valid() const;
     const std::string &getName() const;
-    Rect               getBounds() const;
+    Rect<int32_t>      getBounds() const;
     uint32_t           getWlName() const;
 
     friend class LayerSurface;

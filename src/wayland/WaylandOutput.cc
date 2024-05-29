@@ -53,7 +53,7 @@ const std::string &WaylandOutput::getName() const {
     return this->name.value();
 }
 
-Rect WaylandOutput::getBounds() const {
+Rect<int32_t> WaylandOutput::getBounds() const {
     if (!valid())
         throw std::logic_error("The compositor hasn't sent us the data yet.");
 

@@ -87,6 +87,8 @@ WallpaperImage::WallpaperImage(const std::string &path) {
     );
 }
 
+Vec2<int> WallpaperImage::size() const { return {(int)width, (int)height}; }
+
 WallpaperImage::~WallpaperImage() {
     cairo_surface_destroy(surface);
     delete[] pixeldata;
