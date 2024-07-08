@@ -25,10 +25,10 @@ class WaylandOutput {
     friend class LayerSurface;
 
   private:
-    bool                       posValid, sizeValid;
-    uint32_t                   wl_name;
-    std::optional<std::string> name;
-    int32_t                    w, h, x, y;
+    bool     posValid = false, sizeValid = false, wasValid = false;
+    uint32_t wl_name{};
+    std::optional<std::string> name{};
+    int32_t                    w{}, h{}, x{}, y{};
 
     WaylandManager *wm;
     wl_output      *w_output;

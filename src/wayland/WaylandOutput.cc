@@ -19,7 +19,6 @@ const wl_output_listener WaylandOutput::WL_OUTPUT_LISTENER = {
 };
 
 WaylandOutput::WaylandOutput(WaylandManager *wm, uint32_t wl_name) {
-    x = y = w = h  = 0;
     this->wm       = wm;
     this->wl_name  = wl_name;
     this->w_output = (wl_output *)
@@ -28,10 +27,6 @@ WaylandOutput::WaylandOutput(WaylandManager *wm, uint32_t wl_name) {
         wm->output_manager,
         this->w_output
     );
-
-    this->posValid  = false;
-    this->sizeValid = false;
-    this->name      = {};
 
     wl_output_add_listener(this->w_output, &WL_OUTPUT_LISTENER, this);
     zxdg_output_v1_add_listener(this->x_output, &XDG_OUTPUT_LISTENER, this);
@@ -63,8 +58,9 @@ Rect<int32_t> WaylandOutput::getBounds() const {
 uint32_t WaylandOutput::getWlName() const { return this->wl_name; }
 
 void WaylandOutput::notify_manager_if_valid() {
+    if (wasValid) return; // prevent notifying the manager more than once
     if (!valid()) return;
-
+    wasValid = true;
     this->wm->inputReady(this->wl_name);
 }
 

@@ -20,9 +20,10 @@ int main(int argc, char *argv[]) {
         "Span1",
         std::set<std::string>{"DP-2", "DP-3"}
     ));
+
     w.groups["Span1"]->setWallpaper(img);
-    w.groups["Span1"]->setDisplayMode(DisplayMode::Zoom);
-    w.groups["Span1"]->setFillColor(255,100,200);
+    w.groups["Span1"]->setDisplayMode(DisplayMode::Stretch);
+    w.groups["Span1"]->setFillColor(0, 255, 0);
 
     while (true) {
         w.dispatch();

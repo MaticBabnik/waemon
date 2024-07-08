@@ -16,8 +16,9 @@ void WallpaperManager::inputReady(uint32_t wlName) {
         if (group->matchOutput(output)) {
             std::print(
                 std::cerr,
-                "Grouped output '{}' into '{}'\n",
+                "Grouped output '{}'({}) into '{}'\n",
                 output->getName(),
+                output->getWlName(),
                 group->getName()
             );
             return;
@@ -37,6 +38,8 @@ void WallpaperManager::inputReady(uint32_t wlName) {
 }
 
 void WallpaperManager::inputLost(uint32_t wlName) {
+    std::print(std::cerr, "Lost output {}\n", wlName);
+
     for (auto it = groups.begin(); it != groups.end(); ++it) {
         if (it->second->removeByWlName(wlName)) {
             groups.erase(it);

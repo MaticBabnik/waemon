@@ -27,8 +27,19 @@ void BaseWallpaperGroup::applyWallpaper() {
         auto mode = displayMode;
         auto fill = fill_color;
         auto br   = bounds;
+        auto on   = o.output->getName();
 
-        o.wallpaperSurface->paint([wp, r, mode, fill, br](cairo_t *cr) {
+        std::print(std::cout, "Trying to paint to: {}\n", on);
+
+        o.wallpaperSurface->paint([wp, r, mode, fill, br, on](cairo_t *cr) {
+            std::print(
+                std::cout,
+                "Painting to: {}, offset: {},{}\n",
+                on,
+                r.x,
+                r.y
+            );
+
             // paint background color
             cairo_set_source_rgb(
                 cr,
@@ -58,7 +69,6 @@ void BaseWallpaperGroup::applyWallpaper() {
             }
 
             // Center, Zoom, Contain, Stretch:
-
             double sx = (double)br.w / (double)wp->size().x,
                    sy = (double)br.h / (double)wp->size().y;
 
@@ -67,7 +77,6 @@ void BaseWallpaperGroup::applyWallpaper() {
             else if (mode == DisplayMode::Contain) sy = sx = std::min(sx, sy);
 
             // Math in groupSpace (in pixels, relative to WallpaperGroup):
-
             Vec2<double> groupSz{br.size()};
             Vec2<double> wallpaperSz{wp->size().x * sx, wp->size().y * sy};
             Vec2<double> groupSpacePos = (groupSz - wallpaperSz) / 2.0;
@@ -87,14 +96,6 @@ void BaseWallpaperGroup::applyWallpaper() {
         });
     }
 }
-
-// DisplayMode::Center specific snipet; keeping here since it might be better?
-// if (mode == DisplayMode::Center) {
-//     auto rp = ((br.size() - wp->size()) / 2) - r.origin();
-//     cairo_set_source_surface(cr, wp->surface, rp.x, rp.y);
-//     cairo_paint(cr);
-//     return;
-// }
 
 BasicSingleMonitorGroup::BasicSingleMonitorGroup(
     const std::shared_ptr<WaylandOutput> &output
@@ -119,8 +120,7 @@ const std::string &BasicSingleMonitorGroup::getName() const {
 
 bool BasicSingleMonitorGroup::matchOutput(std::shared_ptr<WaylandOutput> output
 ) {
-    return false; // Single Monitor group should remain... single...
-                  // monitor?
+    return false;
 }
 
 bool BasicSingleMonitorGroup::removeByWlName(uint32_t wl_name) {
@@ -158,12 +158,22 @@ bool SpanGroup::matchOutput(std::shared_ptr<WaylandOutput> output) {
 
 void SpanGroup::recomputeBounds() {
     auto boundingBox =
-        !outputs.empty() ? Rect(0, 0, 0, 0) : outputs[0].output->getBounds();
+        outputs.empty() ? Rect(0, 0, 0, 0) : outputs[0].output->getBounds();
 
     for (const auto &o : outputs | std::views::drop(1)) {
         boundingBox = boundingBox.boundingBoxWith(o.output->getBounds());
     }
     this->bounds = boundingBox;
+
+    std::print(
+        std::cout,
+        "{}: {}x{}@{},{}\n",
+        name,
+        bounds.w,
+        bounds.h,
+        bounds.x,
+        bounds.y
+    );
 
     // make localBounds local
     for (auto &o : outputs) {
@@ -171,6 +181,15 @@ void SpanGroup::recomputeBounds() {
 
         o.localBounds.x = b.x - boundingBox.x;
         o.localBounds.y = b.y - boundingBox.y;
+        std::print(
+            std::cout,
+            "\t{}: {}x{}@{},{}\n",
+            o.output->getName(),
+            o.localBounds.w,
+            o.localBounds.h,
+            o.localBounds.x,
+            o.localBounds.y
+        );
     }
 }
 
@@ -187,6 +206,10 @@ bool SpanGroup::removeByWlName(uint32_t wl_name) {
         outputs.end()
     );
 
-    return false; // don't deletee empty SpanGroups (this makes sense,
-                  // trust)
+    recomputeBounds();
+    if (!outputs.empty()) {
+        applyWallpaper();
+    }
+
+    return false;
 }

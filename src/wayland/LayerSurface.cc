@@ -15,7 +15,7 @@ const wl_buffer_listener LayerSurface::BUFFER_LISTENER = {
 
 const zwlr_layer_surface_v1_listener LayerSurface::LAYER_SURF_LISTENER = {
     .configure = LayerSurface::ON_LAYER_SURF_CONFIGURE,
-    .closed    = nullptr, // FIXME: I hope this doesn't blow up
+    .closed    = LayerSurface::ON_LAYER_SURF_CLOSE,
 };
 
 int make_tmpfile(size_t size) {
@@ -130,4 +130,11 @@ void LayerSurface::ON_LAYER_SURF_CONFIGURE(
         that->paint(that->paintCb.value());
         that->paintCb = {};
     }
+}
+
+void LayerSurface::ON_LAYER_SURF_CLOSE(
+    void                  *data,
+    zwlr_layer_surface_v1 *surf
+) {
+    // No-op
 }

@@ -35,4 +35,6 @@ class LayerSurface {
         uint32_t               w,
         uint32_t               h
     );
+
+    static void ON_LAYER_SURF_CLOSE(void *data, zwlr_layer_surface_v1 *surf);
 };

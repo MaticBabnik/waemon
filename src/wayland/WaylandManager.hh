@@ -15,7 +15,7 @@ class LayerSurface;
 
 class WaylandManager {
   public:
-    WaylandManager(const char *display = nullptr);
+    explicit WaylandManager(const char *display = nullptr);
 
     void dispatch();
 
