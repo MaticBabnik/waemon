@@ -1,4 +1,5 @@
 #include "WaylandManager.hh"
+#include "util/log.hh"
 #include "util/panic.hh"
 #include <cstring>
 #include <iostream>
@@ -107,9 +108,9 @@ WaylandManager::WaylandManager(const char *display) {
 void WaylandManager::dispatch() { wl_display_dispatch(this->display); }
 
 void WaylandManager::inputReady(uint32_t wlName) {
-    std::print(std::cerr, "Input ready: {}\n", wlName);
+    logger::info("Input ready: {}", wlName);
 }
 
 void WaylandManager::inputLost(uint32_t wlName) {
-    std::print(std::cerr, "Input lost: {}\n", wlName);
+    logger::info("Input lost: {}", wlName);
 }

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "WallpaperGroup.hh"
+#include "Group.hh"
 #include "wayland/WaylandManager.hh"
 #include <map>
 #include <memory>
@@ -9,7 +9,7 @@
 class WallpaperManager : public WaylandManager {
   public:
     explicit WallpaperManager(const char *display);
-    void debugAddGroup(std::unique_ptr<BaseWallpaperGroup> wg);
+    void addGroup(std::unique_ptr<BaseWallpaperGroup> wg);
     std::map<std::string, std::unique_ptr<BaseWallpaperGroup>> groups;
 
   protected:

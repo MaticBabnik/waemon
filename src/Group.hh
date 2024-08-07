@@ -1,19 +1,18 @@
 #pragma once
 
 #include "WallpaperImage.hh"
+#include "util/color.hh"
 #include "util/math2d.hh"
+#include "util/displayMode.hh"
 #include "wayland/LayerSurface.hh"
 #include "wayland/WaylandOutput.hh"
 #include <memory>
 #include <optional>
 #include <set>
 #include <string>
-#include <tuple>
 #include <vector>
 
 class WaylandOutput;
-
-enum class DisplayMode { Center, Zoom, Stretch, Tile, Contain };
 
 struct GroupOutput {
     Rect<int32_t>                  localBounds;
@@ -28,16 +27,16 @@ class BaseWallpaperGroup {
 
     virtual const std::string &getName() const = 0;
     void setWallpaper(const std::shared_ptr<WallpaperImage> &image);
-    void setFillColor(uint8_t r, uint8_t g, uint8_t b);
+    void setFillColor(const Color &c);
     void setDisplayMode(DisplayMode dm);
 
   protected:
     virtual void applyWallpaper();
 
+    Color                    fill_color;
     Rect<int32_t>            bounds{0, 0, 0, 0};
     std::vector<GroupOutput> outputs;
 
-    std::tuple<uint8_t, uint8_t, uint8_t>          fill_color;
     std::optional<std::shared_ptr<WallpaperImage>> wallpaper;
 
     DisplayMode displayMode{DisplayMode::Center};

@@ -1,4 +1,5 @@
 #include "LayerSurface.hh"
+#include "util/log.hh"
 #include "util/panic.hh"
 #include <fcntl.h>
 #include <iostream>
@@ -29,7 +30,7 @@ int make_tmpfile(size_t size) {
     if (fd == -1) panic("mkostemp failed");
 
     if (unlink(tmpname.c_str()) != 0)
-        std::print(std::cerr, "Couldn't unlink tmpfile\n");
+        logger::warn("Couldn't unlink tmpfile\n");
 
     if (ftruncate(fd, (ssize_t)size) < 0) panic("ftruncate failed");
 

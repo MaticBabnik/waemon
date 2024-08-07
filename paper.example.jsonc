@@ -1,0 +1,10 @@
+{
+    "groups": {
+        "main": {
+            "outputs": ["DP-3", "DP-2"],
+            "backgroundColor": "#ffffff",
+            "wallpaper": "/home/babnik/Downloads/Wallpapers/favs/1652652710637.png",
+            "mode": "zoom"
+        }
+    }
+}

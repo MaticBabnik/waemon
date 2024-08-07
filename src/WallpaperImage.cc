@@ -1,5 +1,6 @@
 #include "WallpaperImage.hh"
 #include "util/panic.hh"
+#include "util/log.hh"
 #include <OpenImageIO/imagebuf.h>
 #include <algorithm>
 
@@ -75,7 +76,7 @@ WallpaperImage::WallpaperImage(const std::string &path) {
     img->close();
 
     if (!fixColorFormat(colorFormat)) {
-        std::print(std::cerr, "Unsupported color format {}!", colorFormat);
+        logger::warn("Unsupported color format {}!", colorFormat);
     }
 
     surface = cairo_image_surface_create_for_data(
