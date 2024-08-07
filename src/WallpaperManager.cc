@@ -36,7 +36,7 @@ void WallpaperManager::inputReady(uint32_t wlName) {
 }
 
 void WallpaperManager::inputLost(uint32_t wlName) {
-    std::print(std::cerr, "Lost output {}\n", wlName);
+    logger::info("Lost output {}", wlName);
 
     for (auto it = groups.begin(); it != groups.end(); ++it) {
         if (it->second->removeByWlName(wlName)) {

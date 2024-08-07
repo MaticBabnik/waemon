@@ -20,7 +20,7 @@ std::optional<std::string> getFirstConfigPath() {
     auto envConfHome = getenv("XDG_CONFIG_HOME");
     if (envConfHome) {
         fs::path configHome(envConfHome);
-        configHome += CONF_NAME;
+        configHome /= CONF_NAME;
 
         if (fs::is_regular_file(configHome)) {
             return {configHome};
@@ -30,7 +30,8 @@ std::optional<std::string> getFirstConfigPath() {
     auto envHome = getenv("HOME");
     if (envHome) {
         fs::path home(envHome);
-        home += CONF_NAME;
+        home /= ".config";
+        home /= CONF_NAME;
 
         if (fs::is_regular_file(home)) {
             return {home};
@@ -38,7 +39,7 @@ std::optional<std::string> getFirstConfigPath() {
     }
 
     fs::path etc("/etc");
-    etc += CONF_NAME;
+    etc /= CONF_NAME;
 
     if (fs::is_regular_file(etc)) {
         return {etc};
