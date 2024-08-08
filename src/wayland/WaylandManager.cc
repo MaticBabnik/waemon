@@ -3,6 +3,7 @@
 #include "util/panic.hh"
 #include <cstring>
 #include <iostream>
+#include <poll.h>
 
 const wl_registry_listener WaylandManager::REGISTRY_LISTENER = {
     .global        = WaylandManager::ON_REG_GLOBAL,
@@ -105,7 +106,22 @@ WaylandManager::WaylandManager(const char *display) {
         panic("Wayland global is missing (output_manager)!");
 }
 
-void WaylandManager::dispatch() { wl_display_dispatch(this->display); }
+// TODO: make sure this makes sense
+void WaylandManager::dispatch() {
+    wl_display_dispatch_pending(display);
+    struct pollfd fds[] = {{wl_display_get_fd(display), POLLIN, 0}};
+    if (wl_display_prepare_read(display) == 0) {
+        wl_display_flush(display);
+    }
+    int ret = poll(fds, 1, 0);
+
+    if (ret > 0 && (fds[0].revents & POLLIN)) {
+        wl_display_read_events(display);
+        wl_display_dispatch_pending(display);
+    } else {
+        wl_display_cancel_read(display);
+    }
+}
 
 void WaylandManager::inputReady(uint32_t wlName) {
     logger::info("Input ready: {}", wlName);
