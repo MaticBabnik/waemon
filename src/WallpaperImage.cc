@@ -1,6 +1,6 @@
 #include "WallpaperImage.hh"
-#include "util/panic.hh"
 #include "util/log.hh"
+#include "util/panic.hh"
 #include <OpenImageIO/imagebuf.h>
 #include <algorithm>
 
@@ -49,7 +49,11 @@ bool WallpaperImage::fixColorFormat(std::string &colorFormat) {
 WallpaperImage::WallpaperImage(const std::string &path) {
     auto img = ImageInput::open(path.c_str());
 
-    if (!img) panic("Image straightup fucked lol");
+    if (!img) {
+        logger::warn("Could not open '{}'", path);
+        this->valid = false;
+        return;
+    }
 
     const auto &spec = img->spec();
 
@@ -61,22 +65,28 @@ WallpaperImage::WallpaperImage(const std::string &path) {
 
     pixeldata = new uint32_t[width * height];
 
-    img->read_image(
-        0,
-        0,
-        0,
-        4,
-        TypeDesc::UINT8,
-        pixeldata,
-        PIXEL_SIZE,
-        ystride,
-        ZSTRIDE
-    );
+    if (!img->read_image(
+            0,
+            0,
+            0,
+            4,
+            TypeDesc::UINT8,
+            pixeldata,
+            PIXEL_SIZE,
+            ystride,
+            ZSTRIDE
+        )) {
+        logger::warn("Could not read image @ '{}'", path);
+
+        this->valid = false;
+        img->close();
+        return;
+    }
 
     img->close();
 
     if (!fixColorFormat(colorFormat)) {
-        logger::warn("Unsupported color format {}!", colorFormat);
+        logger::warn("Unsupported color format {} @ '{}", colorFormat, path);
     }
 
     surface = cairo_image_surface_create_for_data(
@@ -88,9 +98,44 @@ WallpaperImage::WallpaperImage(const std::string &path) {
     );
 }
 
+bool WallpaperImage::isValid() const { return this->valid; }
+
 Vec2<int> WallpaperImage::size() const { return {(int)width, (int)height}; }
 
+cairo_surface_t *WallpaperImage::getSurface() { return this->surface; }
+
 WallpaperImage::~WallpaperImage() {
-    cairo_surface_destroy(surface);
-    delete[] pixeldata;
+    if (surface) cairo_surface_destroy(surface);
+    if (pixeldata) delete[] pixeldata;
+}
+
+std::map<std::string, std::weak_ptr<WallpaperImage>> WallpaperCache::cache;
+
+std::optional<std::shared_ptr<WallpaperImage>>
+WallpaperCache::get(const std::string &path) {
+    if (cache.contains(path)) {
+        auto cached = cache.at(path).lock();
+        if (cached) {
+            logger::info("Cached '{}'", path);
+            return {cached};
+        }
+    }
+
+    logger::info("Loading '{}'", path);
+    auto wp = new WallpaperImage(path);
+
+    if (!wp->isValid()) {
+        delete wp;
+        return {};
+    }
+
+    // clean expired pointers
+    std::erase_if(cache, [](const auto &pair) {
+        return pair.second.expired();
+    });
+
+    std::shared_ptr<WallpaperImage> sp{wp};
+    // Store a weak reference
+    cache.insert({path, sp});
+    return {sp};
 }

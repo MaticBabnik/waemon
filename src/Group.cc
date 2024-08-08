@@ -42,7 +42,7 @@ void BaseWallpaperGroup::applyWallpaper() {
                 cairo_matrix_t m;
                 auto           ox = r.x % wp->size().x, oy = r.y % wp->size().y;
 
-                auto p = cairo_pattern_create_for_surface(wp->surface);
+                auto p = cairo_pattern_create_for_surface(wp->getSurface());
                 cairo_pattern_set_extend(p, CAIRO_EXTEND_REPEAT);
 
                 if (ox || oy) { // apply offset matrix if nonzero
@@ -75,7 +75,7 @@ void BaseWallpaperGroup::applyWallpaper() {
             cairo_scale(cr, sx, sy);
             cairo_set_source_surface(
                 cr,
-                wp->surface,
+                wp->getSurface(),
                 outputSpacePos.x / sx, // scale into cairo space
                 outputSpacePos.y / sy
             );

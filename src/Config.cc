@@ -132,11 +132,10 @@ void addGroupsFromConfig(const std::string &path, WallpaperManager &wm) {
         auto sg = std::make_unique<SpanGroup>(groupName, outputs);
 
         if (group.contains("wallpaper") && group["wallpaper"].is_string()) {
-            auto wp = std::make_shared<WallpaperImage>(
-                group["wallpaper"].get<std::string>()
-            );
+            auto wp =
+                WallpaperCache::get(group["wallpaper"].get<std::string>());
 
-            sg->setWallpaper(wp);
+            if (wp.has_value()) sg->setWallpaper(*wp);
         }
 
         if (group.contains("backgroundColor")
