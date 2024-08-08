@@ -46,7 +46,7 @@ bool WallpaperImage::fixColorFormat(std::string &colorFormat) {
     return false;
 }
 
-WallpaperImage::WallpaperImage(const std::string &path) {
+WallpaperImage::WallpaperImage(const std::string &path) : path(path) {
     auto img = ImageInput::open(path.c_str());
 
     if (!img) {
@@ -104,15 +104,15 @@ Vec2<int> WallpaperImage::size() const { return {(int)width, (int)height}; }
 
 cairo_surface_t *WallpaperImage::getSurface() { return this->surface; }
 
+std::string WallpaperImage::getPath() { return this->path; }
+
 WallpaperImage::~WallpaperImage() {
     if (surface) cairo_surface_destroy(surface);
     if (pixeldata) delete[] pixeldata;
 }
 
 std::map<std::string, std::weak_ptr<WallpaperImage>> WallpaperCache::cache;
-
-std::optional<std::shared_ptr<WallpaperImage>>
-WallpaperCache::get(const std::string &path) {
+std::shared_ptr<WallpaperImage> WallpaperCache::get(const std::string &path) {
     if (cache.contains(path)) {
         auto cached = cache.at(path).lock();
         if (cached) {
@@ -126,7 +126,7 @@ WallpaperCache::get(const std::string &path) {
 
     if (!wp->isValid()) {
         delete wp;
-        return {};
+        return nullptr;
     }
 
     // clean expired pointers
@@ -137,5 +137,5 @@ WallpaperCache::get(const std::string &path) {
     std::shared_ptr<WallpaperImage> sp{wp};
     // Store a weak reference
     cache.insert({path, sp});
-    return {sp};
+    return sp;
 }

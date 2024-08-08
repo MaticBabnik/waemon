@@ -1,8 +1,8 @@
 #include "Config.hh"
 #include "WallpaperImage.hh"
 #include "util/log.hh"
+#include "util/panic.hh"
 #include <filesystem>
-#include <locale>
 #include <memory>
 #include <nlohmann/json.hpp>
 #include <set>
@@ -48,56 +48,17 @@ std::optional<std::string> getFirstConfigPath() {
     return {};
 }
 
-Color parseColor(std::string colorString) {
-    if ((colorString.length() != 4 && colorString.length() != 7)
-        || colorString[0] != '#') {
-        logger::warn("Invalid color string: '{}'", colorString);
-        return {0, 0, 0};
-    }
-
-    auto n = strtoul(colorString.c_str() + 1, nullptr, 16);
-    if (colorString.length() == 4) {
-        // sepeate nibbles into bytes, then duplicate low nibbles into high
-        n = (n & 0xf00) << 8 | (n & 0xf0) << 4 | (n & 0xf);
-        n *= 0x11;
-    }
-
-    return {(uint8_t)(n >> 16), (uint8_t)(n >> 8), (uint8_t)n};
-}
-
-/*
-    Parses a DisplayMode (one of: center, zoom, stretch, tile, contain)
-*/
-DisplayMode parseMode(std::string modeString) {
-    std::transform(
-        modeString.begin(),
-        modeString.end(),
-        modeString.begin(),
-        [](unsigned char c) { return std::tolower(c); }
-    );
-
-    if (modeString == "center") {
-        return DisplayMode::Center;
-    } else if (modeString == "zoom") {
-        return DisplayMode::Zoom;
-    } else if (modeString == "stretch") {
-        return DisplayMode::Stretch;
-    } else if (modeString == "tile") {
-        return DisplayMode::Tile;
-    } else if (modeString == "contain") {
-        return DisplayMode::Contain;
-    } else {
-        logger::warn("Invalid display mode: '{}'", modeString);
-        return DisplayMode::Zoom;
-    }
-}
-
 using json = nlohmann::json;
 
 void addGroupsFromConfig(const std::string &path, WallpaperManager &wm) {
     std::ifstream f(path);
 
-    json config = json::parse(f);
+    json config;
+    try {
+        config = json::parse(f);
+    } catch (nlohmann::detail::parse_error &pe) {
+        panic("Error parsing config file: {}", pe.what());
+    }
 
     if (!config.contains("groups") || !config["groups"].is_object()) {
         logger::warn("No 'groups' object in config");
@@ -135,18 +96,18 @@ void addGroupsFromConfig(const std::string &path, WallpaperManager &wm) {
             auto wp =
                 WallpaperCache::get(group["wallpaper"].get<std::string>());
 
-            if (wp.has_value()) sg->setWallpaper(*wp);
+            if (wp) sg->setWallpaper(wp);
         }
 
         if (group.contains("backgroundColor")
             && group["backgroundColor"].is_string()) {
-            auto c = parseColor(group["backgroundColor"].get<std::string>());
+            Color c = {group["backgroundColor"].get<std::string>()};
 
             sg->setFillColor(c);
         }
 
         if (group.contains("mode") && group["mode"].is_string()) {
-            auto m = parseMode(group["mode"].get<std::string>());
+            auto m = parseDisplayMode(group["mode"].get<std::string>());
             sg->setDisplayMode(m);
         }
 

@@ -53,14 +53,15 @@ Response
             "mode": "zoom",
             "total_w": 2560,
             "total_h": 1400,
-            "matchedOutputs": {
-                "DP-2": {
+            "matchedOutputs": [
+                {
+                    "name": "DP-2",
                     "x": 0,
                     "y": 0,
                     "w": 2560,
                     "h": 1440
                 }
-            }
+            ]
         },
     }
 }
@@ -100,7 +101,7 @@ If anything goes wrong the daemon will reply with
 
 - [x] static output group definitions (jsonc)
 - [x] fixup WallpaperImage error handling and add cache
-- [-] dynamic wallpaper and spantype changes over DBus or normal socket (json messages)
+- [x] dynamic wallpaper and spantype changes over DBus or normal socket (json messages)
 - [ ] split into daemon and cli
 - [ ] Come up with a new name (`paper` is too generic and seems to be used by libpaper)
 - [ ] package for arch

@@ -11,4 +11,4 @@ void panic_impl(const char *s) noexcept {
     std::abort();
 }
 
-}
+} // namespace hidden

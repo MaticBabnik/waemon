@@ -1,5 +1,6 @@
 #include "Config.hh"
 #include "Group.hh"
+#include "IPC.hh"
 #include "Socket.hh"
 #include "WallpaperImage.hh"
 #include "WallpaperManager.hh"
@@ -31,11 +32,8 @@ int main(int argc, char *argv[]) {
     while (true) {
         w.dispatch();
 
-        sock.dispatch([](std::string &msg, int fd) {
-            logger::info("Read({}): {}", fd, msg);
-
-            std::string response{"Hello"};
-            write(fd, response.c_str(), response.length() + 1);
+        sock.dispatch([&w](std::string &msg, int fd) {
+            handleCommand(w, fd, msg);
         });
     }
 }

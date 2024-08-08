@@ -4,20 +4,91 @@
 #include <ranges>
 #include <utility>
 
+void to_json(json &j, const GroupOutput &p) {
+    j = json{
+        {"x", p.localBounds.x},
+        {"y", p.localBounds.y},
+        {"w", p.localBounds.w},
+        {"h", p.localBounds.h},
+        {"name", p.output->getName()}
+    };
+}
+
+json BaseWallpaperGroup::serializeStatus() {
+    json body{
+        {"mode", displayModeString(this->displayMode)},
+        {"total_w", this->bounds.w},
+        {"total_h", this->bounds.h},
+        {"backgroundColor", fill_color.toString()},
+        {"wallpaper",
+         wallpaper.transform([](auto x) { return x->getPath(); }).value_or("")},
+        {"matchedOutputs", outputs}
+    };
+
+    return body;
+}
+
 void BaseWallpaperGroup::setWallpaper(const std::shared_ptr<WallpaperImage> &img
 ) {
     this->wallpaper = img;
     applyWallpaper();
 }
 
-void BaseWallpaperGroup::setFillColor(const Color &c) { this->fill_color = c; }
+void BaseWallpaperGroup::setFillColor(const Color &c) {
+    this->fill_color = c;
+    applyWallpaper();
+}
 
 void BaseWallpaperGroup::setDisplayMode(DisplayMode dm) {
     this->displayMode = dm;
+    applyWallpaper();
+}
+
+void BaseWallpaperGroup::set(
+    std::shared_ptr<WallpaperImage> image,
+    std::optional<Color>            color,
+    std::optional<DisplayMode>      dm
+) {
+    int cc = 0;
+
+    if (image) {
+        this->wallpaper = image;
+        cc++;
+    }
+
+    if (color.has_value()) {
+        this->fill_color = *color;
+        cc++;
+    }
+
+    if (dm.has_value()) {
+        this->displayMode = *dm;
+        cc++;
+    }
+
+    if (cc) {
+        applyWallpaper();
+    }
 }
 
 void BaseWallpaperGroup::applyWallpaper() {
-    if (!wallpaper.has_value()) return;
+    if (!wallpaper.has_value()) {
+        for (auto &o : outputs) {
+            auto fill = fill_color;
+
+            o.wallpaperSurface->paint([fill](cairo_t *cr) {
+                // paint background color
+                cairo_set_source_rgb(
+                    cr,
+                    fill.r / 255.0,
+                    fill.g / 255.0,
+                    fill.b / 255.0
+                );
+                cairo_paint(cr);
+            });
+        }
+        return;
+    }
 
     for (auto &o : outputs) {
         auto wp   = this->wallpaper->get();

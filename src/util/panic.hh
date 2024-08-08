@@ -7,6 +7,9 @@
 #include <type_traits>
 
 namespace hidden {
+constexpr std::string_view RESET_COLOR = "\033[0m";
+constexpr std::string_view ERROR       = "\033[1;31m";
+
 struct panic_dynamic_string_view {
     template <class T>
         requires std::constructible_from<std::string_view, T>
@@ -51,9 +54,11 @@ void panic(
     requires(sizeof...(Args) > 0)
 {
     auto msg = std::format(
-        "{}:{} panic: {}\n",
+        "{}[FATAL @ {}:{}]{} {}\n",
+        ERROR,
         fmt.loc.file_name(),
         fmt.loc.line(),
+        RESET_COLOR,
         std::format(fmt.fmt, std::forward<Args>(args)...)
     );
     panic_impl(msg.c_str());

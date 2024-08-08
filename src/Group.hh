@@ -1,12 +1,12 @@
 #pragma once
 
+#include "Common.hh"
 #include "WallpaperImage.hh"
-#include "util/color.hh"
 #include "util/math2d.hh"
-#include "util/displayMode.hh"
 #include "wayland/LayerSurface.hh"
 #include "wayland/WaylandOutput.hh"
 #include <memory>
+#include <nlohmann/json.hpp>
 #include <optional>
 #include <set>
 #include <string>
@@ -20,6 +20,8 @@ struct GroupOutput {
     std::unique_ptr<LayerSurface>  wallpaperSurface;
 };
 
+using json = nlohmann::json;
+
 class BaseWallpaperGroup {
   public:
     virtual bool matchOutput(std::shared_ptr<WaylandOutput> output) = 0;
@@ -29,6 +31,13 @@ class BaseWallpaperGroup {
     void setWallpaper(const std::shared_ptr<WallpaperImage> &image);
     void setFillColor(const Color &c);
     void setDisplayMode(DisplayMode dm);
+
+    void
+    set(std::shared_ptr<WallpaperImage> image,
+        std::optional<Color>            color,
+        std::optional<DisplayMode>      dm);
+
+    json serializeStatus();
 
   protected:
     virtual void applyWallpaper();

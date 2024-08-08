@@ -45,3 +45,13 @@ void WallpaperManager::inputLost(uint32_t wlName) {
         }
     }
 }
+
+json WallpaperManager::serializeStatus() {
+    json body{{"groups", {}}};
+
+    for (const auto &p : groups) {
+        body["groups"][p.first] = p.second->serializeStatus();
+    }
+
+    return body;
+}

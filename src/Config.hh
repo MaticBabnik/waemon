@@ -1,8 +1,7 @@
 #pragma once
+#include "Common.hh"
 #include "Group.hh"
 #include "WallpaperManager.hh"
-#include "util/color.hh"
-#include "util/displayMode.hh"
 #include <optional>
 #include <string>
 
@@ -15,14 +14,4 @@
 */
 std::optional<std::string> getFirstConfigPath();
 
-/*
-    Parses colors formated like #fff or #123456
-*/
-Color parseColor(std::string colorString);
-
-/*
-    Parses a DisplayMode (one of: center, zoom, stretch, tile, contain)
-*/
-DisplayMode parseMode(std::string modeString);
-
-void addGroupsFromConfig(const std::string& path, WallpaperManager& wm);
+void addGroupsFromConfig(const std::string &path, WallpaperManager &wm);

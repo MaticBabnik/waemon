@@ -4,10 +4,7 @@
 #include <cairo/cairo.h>
 #include <map>
 #include <memory>
-#include <optional>
 #include <string>
-
-
 
 class WallpaperImage {
   public:
@@ -17,6 +14,7 @@ class WallpaperImage {
     bool      isValid() const;
     Vec2<int> size() const;
 
+    std::string      getPath();
     cairo_surface_t *getSurface();
 
   protected:
@@ -25,13 +23,14 @@ class WallpaperImage {
 
     uint32_t width, height;
 
+    std::string      path;
     cairo_surface_t *surface   = nullptr;
     uint32_t        *pixeldata = nullptr;
 };
 
 class WallpaperCache {
   public:
-    static std::optional<std::shared_ptr<WallpaperImage>>
+    static std::shared_ptr<WallpaperImage>
     get(const std::string &path);
 
   private:

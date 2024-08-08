@@ -101,8 +101,8 @@ void Socket::handleClientData(
     int                                      conn,
     std::function<void(std::string &, int)> &messageHandler
 ) {
-    char readBuffer[1024] = {0};
-    int  messageSize      = read(conn, readBuffer, sizeof(readBuffer) - 1);
+    char readBuffer[16 * 1024] = {0};
+    int  messageSize           = read(conn, readBuffer, sizeof(readBuffer) - 1);
 
     if (messageSize <= 0) {
         close(conn);
