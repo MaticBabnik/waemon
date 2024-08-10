@@ -38,6 +38,7 @@ void Socket::setupSocket() {
 
     struct sockaddr_un address = {.sun_family = AF_UNIX};
     strcpy(address.sun_path, socketPath.c_str());
+
     unlink(socketPath.c_str());
 
     if (bind(listenSock, (sockaddr *)&address, SUN_LEN(&address)) < 0) {

@@ -40,8 +40,14 @@ void panic_impl(const char *s) noexcept;
 
 [[noreturn]]
 inline void panic(panic_dynamic_string_view s) noexcept {
-    auto msg =
-        std::format("{}:{} panic: {}\n", s.loc.file_name(), s.loc.line(), s.s);
+    auto msg = std::format(
+        "{}[FATAL @ {}:{}]{} {}\n",
+        ERROR,
+        s.loc.file_name(),
+        s.loc.line(),
+        RESET_COLOR,
+        s.s
+    );
     panic_impl(msg.c_str());
 }
 

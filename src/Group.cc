@@ -15,7 +15,7 @@ void to_json(json &j, const GroupOutput &p) {
 }
 
 json BaseWallpaperGroup::serializeStatus() {
-    json body{
+    return json{
         {"mode", displayModeString(this->displayMode)},
         {"total_w", this->bounds.w},
         {"total_h", this->bounds.h},
@@ -24,8 +24,6 @@ json BaseWallpaperGroup::serializeStatus() {
          wallpaper.transform([](auto x) { return x->getPath(); }).value_or("")},
         {"matchedOutputs", outputs}
     };
-
-    return body;
 }
 
 void BaseWallpaperGroup::setWallpaper(const std::shared_ptr<WallpaperImage> &img

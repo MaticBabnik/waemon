@@ -1,33 +1,32 @@
 #include "Config.hh"
 #include "Group.hh"
 #include "IPC.hh"
-#include "Socket.hh"
 #include "WallpaperImage.hh"
 #include "WallpaperManager.hh"
+#include "util/Socket.hh"
+#include "util/lock.hh"
 #include "util/log.hh"
 #include "util/panic.hh"
 
-std::string getSocketPath() {
-    auto rtdir = getenv("XDG_RUNTIME_DIR");
-    if (!rtdir) panic("No XDG_RUNTIME_DIR");
-
-    return std::string(rtdir) + "/paper.sock";
-}
-
 [[noreturn]]
 int main(int argc, char *argv[]) {
-
-    auto configPath = getFirstConfigPath();
-    if (!configPath.has_value()) {
-        panic("No configuration files found");
+    ExclusiveLock lock{getLockPath()};
+    if (!lock.locked()) {
+        // TODO: Maybe kill the other instance, so that WMs can "reload" us.
+        // TODO: Maybe tell the other instance to seppuku over IPC
+        panic("Couldn't obtain lock. Is another instance running?");
     }
 
     WallpaperManager w(nullptr);
+    Socket           sock{getSocketPath()};
 
-    Socket sock{getSocketPath()};
-
-    logger::info("Using config file: {}", *configPath);
-    addGroupsFromConfig(*configPath, w);
+    auto configPath = getFirstConfigPath();
+    if (configPath.has_value()) {
+        logger::info("Using config file: {}", *configPath);
+        addGroupsFromConfig(*configPath, w);
+    } else {
+        logger::warn("No configuration files found");
+    }
 
     while (true) {
         w.dispatch();

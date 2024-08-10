@@ -10,7 +10,21 @@
 
 namespace fs = std::filesystem;
 
-const std::string CONF_NAME = "paper.jsonc";
+const std::string CONF_NAME = PROGRAM_NAME ".jsonc";
+
+std::string getSocketPath() {
+    auto rtdir = getenv("XDG_RUNTIME_DIR");
+    if (!rtdir) panic("No XDG_RUNTIME_DIR");
+
+    return std::string(rtdir) + "/" PROGRAM_NAME ".sock";
+}
+
+std::string getLockPath() {
+    auto rtdir = getenv("XDG_RUNTIME_DIR");
+    if (!rtdir) panic("No XDG_RUNTIME_DIR");
+
+    return std::string(rtdir) + "/" PROGRAM_NAME ".lock";
+}
 
 std::optional<std::string> getFirstConfigPath() {
     if (fs::is_regular_file(CONF_NAME)) {
