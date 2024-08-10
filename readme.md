@@ -31,7 +31,13 @@ On startup configuration is read from one of (in order):
 }
 ```
 
-## Socket protocol [not functional]
+## Socket protocol
+
+Waemon tries to bind to `$XDG_RUNTIME_DIR/waemon.sock`. You can send commands to it using:
+
+```bash
+print '["status"]' | socat "UNIX-CONNECT:/run/user/$UID/waemon.sock"  - | jq
+```
 
 ### Get current status
 
