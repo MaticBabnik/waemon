@@ -23,7 +23,7 @@ int make_tmpfile(size_t size) {
     auto rtdir = getenv("XDG_RUNTIME_DIR");
     if (!rtdir) panic("No XDG_RUNTIME_DIR");
 
-    auto tmpname = std::string(rtdir) + "/paper_XXXXXX";
+    auto tmpname = std::string(rtdir) + "/waemon_XXXXXX";
 
     auto fd = mkostemp((char *)tmpname.c_str(), O_CLOEXEC);
 
@@ -45,7 +45,7 @@ LayerSurface::LayerSurface(const std::shared_ptr<WaylandOutput> &wo_)
         surface,
         wo->w_output,
         ZWLR_LAYER_SHELL_V1_LAYER_BACKGROUND,
-        "paper"
+        "waemon"
     );
 
     zwlr_layer_surface_v1_set_anchor(

@@ -24,6 +24,8 @@ using json = nlohmann::json;
 
 class BaseWallpaperGroup {
   public:
+    virtual ~BaseWallpaperGroup() = default;
+
     virtual bool matchOutput(std::shared_ptr<WaylandOutput> output) = 0;
     virtual bool removeByWlName(uint32_t wl_name)                   = 0;
 

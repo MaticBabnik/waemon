@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.20)
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
-project(paper)
+project(waemon)
 
 execute_process(
     COMMAND pkg-config --variable=pkgdatadir wayland-protocols
@@ -34,18 +34,21 @@ endfunction()
 
 file(GLOB_RECURSE SRCFILES "src/*.cc")
 
-add_executable(paper ${SRCFILES})
-set_property(TARGET paper PROPERTY CXX_STANDARD 23)
+add_executable(waemon ${SRCFILES})
+set_property(TARGET waemon PROPERTY CXX_STANDARD 23)
 
 find_package(OpenImageIO REQUIRED)
 find_package(CAIRO REQUIRED)
 find_package(nlohmann_json REQUIRED)
 
 
-protocol(paper "protocols/wlr-layer-shell-unstable-v1.xml" "wlr-layer-shell-unstable-v1" true)
-protocol(paper "stable/xdg-shell/xdg-shell.xml" "xdg-shell" false)
-protocol(paper "protocols/xdg-output-unstable-v1.xml" "xdg-output-unstable-v1" true)
+protocol(waemon "protocols/wlr-layer-shell-unstable-v1.xml" "wlr-layer-shell-unstable-v1" true)
+protocol(waemon "stable/xdg-shell/xdg-shell.xml" "xdg-shell" false)
+protocol(waemon "protocols/xdg-output-unstable-v1.xml" "xdg-output-unstable-v1" true)
 
 
-target_link_libraries(paper PRIVATE wayland-client ${OpenImageIO_LIBRARY} ${CAIRO_LIBRARIES} nlohmann_json::nlohmann_json)
-target_include_directories(paper PRIVATE src/ ${WL_CODEGEN_DIR} ${OpenImageIO_INCLUDE_DIR} ${CAIRO_INCLUDE_DIRS})
+target_link_libraries(waemon PRIVATE wayland-client ${OpenImageIO_LIBRARY} ${CAIRO_LIBRARIES} nlohmann_json::nlohmann_json)
+target_include_directories(waemon PRIVATE src/ ${WL_CODEGEN_DIR} ${OpenImageIO_INCLUDE_DIR} ${CAIRO_INCLUDE_DIRS})
+
+
+install(TARGETS waemon DESTINATION bin)

@@ -1,15 +1,15 @@
-# Paper
+# Waemon
 
-Wallpaper? I hardly even know her!
+Wayland wallpaper daemon.
 
 ## Configuration
 
 On startup configuration is read from one of (in order):
 
-- `./paper.jsonc`
-- `${XDG_CONFIG_HOME}/paper.jsonc`
-- `~/.config/paper.jsonc`
-- `/etc/paper.jsonc`
+- `./waemon.jsonc`
+- `${XDG_CONFIG_HOME}/waemon.jsonc`
+- `~/.config/waemon.jsonc`
+- `/etc/waemon.jsonc`
 
 ```jsonc
 {
@@ -103,5 +103,5 @@ If anything goes wrong the daemon will reply with
 - [x] fixup WallpaperImage error handling and add cache
 - [x] dynamic wallpaper and spantype changes over DBus or normal socket (json messages)
 - [ ] split into daemon and cli
-- [ ] Come up with a new name (`paper` is too generic and seems to be used by libpaper)
+- [x] Come up with a new name (was paper)
 - [ ] package for arch

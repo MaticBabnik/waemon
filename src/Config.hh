@@ -6,15 +6,15 @@
 #include <string>
 
 #ifndef PROGRAM_NAME
-#define PROGRAM_NAME "paper"
+#define PROGRAM_NAME "waemon"
 #endif
 
 /*
     Checks for valid configs in:
-        - `./paper.jsonc`
-        - `${XDG_CONFIG_HOME}/paper.jsonc`
-        - `${HOME}/.config/paper.jsonc`
-        - `/etc/paper.jsonc`
+        - `./waemon.jsonc`
+        - `${XDG_CONFIG_HOME}/waemon.jsonc`
+        - `${HOME}/.config/waemon.jsonc`
+        - `/etc/waemon.jsonc`
 */
 std::optional<std::string> getFirstConfigPath();
 

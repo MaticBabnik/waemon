@@ -1,7 +1,5 @@
 #include "Config.hh"
-#include "Group.hh"
 #include "IPC.hh"
-#include "WallpaperImage.hh"
 #include "WallpaperManager.hh"
 #include "util/Socket.hh"
 #include "util/lock.hh"
@@ -24,13 +22,10 @@ int main(int argc, char *argv[]) {
     if (configPath.has_value()) {
         logger::info("Using config file: {}", *configPath);
         addGroupsFromConfig(*configPath, w);
-    } else {
-        logger::warn("No configuration files found");
-    }
+    } else logger::warn("No configuration files found");
 
     while (true) {
         w.dispatch();
-
         sock.dispatch([&w](std::string &msg, int fd) {
             handleCommand(w, fd, msg);
         });
