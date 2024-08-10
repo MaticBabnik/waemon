@@ -113,7 +113,7 @@ void WaylandManager::dispatch() {
     if (wl_display_prepare_read(display) == 0) {
         wl_display_flush(display);
     }
-    int ret = poll(fds, 1, 0);
+    int ret = poll(fds, 1, 1); // TODO: make sure this also makes senese
 
     if (ret > 0 && (fds[0].revents & POLLIN)) {
         wl_display_read_events(display);

@@ -22,7 +22,7 @@ Socket::~Socket() {
 void Socket::dispatch(std::function<void(std::string &, int)> messageHandler) {
     struct epoll_event events[IPC_N_CONN];
 
-    int num_events = epoll_wait(epollFd, events, IPC_N_CONN, 0);
+    int num_events = epoll_wait(epollFd, events, IPC_N_CONN, 1);
 
     for (int i = 0; i < num_events; i++) {
         if (events[i].data.fd == listenSock) handleNewConnection();
