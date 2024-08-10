@@ -1,6 +1,11 @@
 # Waemon
+![AUR Version](https://img.shields.io/aur/version/waemon-git?style=for-the-badge)
 
 Wayland wallpaper daemon.
+
+## Installation
+
+[Archlinux User Repository](https://aur.archlinux.org/packages/waemon-git): `waemon-git`
 
 ## Configuration
 
@@ -110,4 +115,4 @@ If anything goes wrong the daemon will reply with
 - [x] dynamic wallpaper and spantype changes over DBus or normal socket (json messages)
 - [ ] split into daemon and cli
 - [x] Come up with a new name (was paper)
-- [ ] package for arch
+- [x] package for arch
